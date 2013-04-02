@@ -16,29 +16,44 @@
 
 package org.scribbol;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.cometd.bayeux.Message;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
-import org.cometd.server.AbstractService;
+import org.cometd.annotation.Listener;
+import org.cometd.annotation.Service;
+import org.cometd.annotation.Session;
 
-public class HelloService extends AbstractService
+@Named
+@Singleton
+@Service("helloService")
+public class HelloService
 {
-    public HelloService(BayeuxServer bayeux)
+    @Inject
+    private BayeuxServer bayeux;
+    @Session
+    private ServerSession serverSession;
+
+    @PostConstruct
+    public void init()
     {
-        super(bayeux, "hello");
-        addService("/service/hello", "processHello");
     }
 
-    public void processHello(ServerSession remote, Message message)
+    @Listener("/service/hello")
+    public void processHello(ServerSession remote, ServerMessage.Mutable message)
     {
         Map<String, Object> input = message.getDataAsMap();
         String name = (String)input.get("name");
 
         Map<String, Object> output = new HashMap<String, Object>();
         output.put("greeting", "Hello, " + name);
-        remote.deliver(getServerSession(), "/hello", output, null);
+        remote.deliver(serverSession, "/hello", output, null);
     }
 }

@@ -16,25 +16,74 @@
 
 package org.scribbol;
 
-import java.io.IOException;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
 
 import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.annotation.ServerAnnotationProcessor;
+import org.cometd.server.BayeuxServerImpl;
+import org.cometd.server.transport.JSONPTransport;
+import org.cometd.server.transport.JSONTransport;
+import org.cometd.websocket.server.WebSocketTransport;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.ServletContextAware;
 
-public class BayeuxInitializer extends GenericServlet
+@Component
+public class BayeuxInitializer implements DestructionAwareBeanPostProcessor, ServletContextAware
 {
-    public void init() throws ServletException
+    private BayeuxServer bayeuxServer;
+    private ServerAnnotationProcessor processor;
+
+    @Inject
+    private void setBayeuxServer(BayeuxServer bayeuxServer)
     {
-        BayeuxServer bayeux = (BayeuxServer)getServletContext().getAttribute(BayeuxServer.ATTRIBUTE);
-        new HelloService(bayeux);
+        this.bayeuxServer = bayeuxServer;
     }
 
-    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException
+    @PostConstruct
+    private void init()
     {
-        throw new ServletException();
+        this.processor = new ServerAnnotationProcessor(bayeuxServer);
+    }
+
+    @PreDestroy
+    private void destroy()
+    {
+    }
+
+    public Object postProcessBeforeInitialization(Object bean, String name) throws BeansException
+    {
+        processor.processDependencies(bean);
+        processor.processConfigurations(bean);
+        processor.processCallbacks(bean);
+        return bean;
+    }
+
+    public Object postProcessAfterInitialization(Object bean, String name) throws BeansException
+    {
+        return bean;
+    }
+
+    public void postProcessBeforeDestruction(Object bean, String name) throws BeansException
+    {
+        processor.deprocessCallbacks(bean);
+    }
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public BayeuxServer bayeuxServer()
+    {
+        BayeuxServerImpl bean = new BayeuxServerImpl();
+        bean.setTransports(new WebSocketTransport(bean), new JSONTransport(bean), new JSONPTransport(bean));
+        return bean;
+    }
+
+    public void setServletContext(ServletContext servletContext)
+    {
+        servletContext.setAttribute(BayeuxServer.ATTRIBUTE, bayeuxServer);
     }
 }
