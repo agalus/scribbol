@@ -42,8 +42,8 @@
                     <webAppConfig>
                         <contextPath>/scribbol</contextPath>
                     </webAppConfig>
-                    <stopKey>C</stopKey>
-                    <stopPort>8081</stopPort>
+                    <!--<stopKey>C</stopKey>-->
+                    <!--<stopPort>8081</stopPort>-->
                 </configuration>
             </plugin>
         </plugins>
@@ -109,6 +109,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>

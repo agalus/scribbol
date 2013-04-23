@@ -6,6 +6,9 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/jquery/jquery-1.8.3.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/org/cometd.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/jquery/jquery.cometd.js"></script>
+    <script type="text/javascript" src="scribbol.js"></script>
+    <script type="text/javascript" src="scribbol-net.js"></script>
+    <script type="text/javascript" src="sha1.js"></script>
     <script type="text/javascript" src="application.js"></script>
     <%--
     The reason to use a JSP is that it is very easy to obtain server-side configuration
@@ -20,84 +23,58 @@
 <body>
     <style>
         p { margin-top: 0px; margin-bottom: 0px; }
-        #log1, #body { display: inline-block; width: 350px; height: 100px; overflow-y: scroll; font-family: monospace; font-size: 11px; }
+        #logContainer, #body { display: inline-block; width: 350px; height: 100px; overflow-y: scroll; font-family: monospace; font-size: 11px; overflow-y: scroll }
+        #debugContainer { position: absolute; display: inline-block; bottom: 20px; left: 0px; height: 100px; font-family: monospace; font-size: 11px; }
         .log strong { margin-bottom: 10px; display: block; }
     </style>
     <div>
-        <div id="canvasContainer">
-            <canvas id="c" width=700 height=900></canvas>
-        </div>
         <div id="toolbar">
             <p>
-                <button type="button" class="btn mode" onclick="toggleMode()">Mode</button>
+                <button type="button" class="btn mode" onclick="toggleMode()">Freehand / Sel</button>
                 <button type="button" class="btn rect">Rectangle</button>
                 <button type="button" class="btn circle">Circle</button>
-                <button type="button" class="btn triangle">Triangle</button>
-                <button type="button" class="btn freehand">Freehand</button>
+                <button type="button" class="btn debug">Debug</button>
             </p>
+        </div>
+        <div id="canvasContainer">
+            <canvas id="canvasElement" width=200 height=200></canvas>
         </div>
     </div>
 
-    <div>
-        <div id="log1">&nbsp;</div>
-        <div id="body"></div>
+    <div id="debugContainer">
+        <div id="logContainer">&nbsp;</div>
+        <div id="body">&nbsp;</div>
     </div>
     <script>
 
-        var canvas = new fabric.Canvas('c');
+        function positionElements(canvasElement, toolbarContainer, debugContainer) {
+            canvasElement.width = document.width;
+            canvasElement.height = document.height - toolbarContainer.style.pixelHeight;
 
-        // create a rectangle object
-        var rect = new fabric.Rect({
-            left: 100,
-            top: 100,
-            fill: 'red',
-            width: 20,
-            height: 20
-        });
-
-        // "add" rectangle onto canvas
-        canvas.add(rect);
-        canvas.isDrawingMode = true;
-
-        var log1 = document.getElementById('log1');
-
-        function log(message) {
-            var el = document.createElement('p');
-            el.appendChild(document.createTextNode(message));
-            var containerEl = log1;
-            containerEl.insertBefore(el, containerEl.firstChild);
         }
 
-        function toggleMode() {
-            canvas.isDrawingMode = !canvas.isDrawingMode;
-        }
-
-        function handleEvent(eventName, event) {
-            if( eventName == 'object:moving') {
-                log('object moving!!!!') ;
-            }
-            log(eventName);
+        function generateId() {
+            var i = Math.random();
+            var hash = CryptoJS.SHA1("scribbol" +i);
+            return hash;
         }
 
 
-        function observe(eventName) {
-            canvas.on(eventName, function(e){ handleEvent(eventName, e) });
-        }
+        var log = document.getElementById('logContainer');
+        var debugContainer = document.getElementById('debugContainer');
+        var canvasElement = document.getElementById('canvasElement');
+        var toolBar = document.getElementById('toolbar');
 
-        observe('object:modified');
-        observe('object:selected');
-        observe('object:moving');
-        observe('object:scaling');
-        observe('object:rotating');
-        observe('before:selection:cleared');
-        observe('selection:cleared');
-        observe('selection:created');
-        observe('mouse:up');
-        observe('mouse:down');
-        observe('mouse:move');
-        observe('after:render');
-        observe('path:created');
-        observe('object:added');
+        positionElements(canvasElement,toolBar, debugContainer);
+
+
+
+        // Setup the Fabric Canvas
+        var canvas = new fabric.Canvas('canvasElement');
+
+        scribbol.initialize(canvas, log);
+        scribbol.util.generateNewId = generateId;
+        scribbol.setDrawingMode(true);
 
     </script>
 

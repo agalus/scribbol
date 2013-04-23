@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.scribbol;
+package org.scribbol.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.cometd.annotation.Listener;
+import org.cometd.annotation.Service;
+import org.cometd.annotation.Session;
+import org.cometd.bayeux.Channel;
+import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.bayeux.server.ServerMessage;
+import org.cometd.bayeux.server.ServerSession;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import org.cometd.bayeux.server.BayeuxServer;
-import org.cometd.bayeux.server.ServerMessage;
-import org.cometd.bayeux.server.ServerSession;
-import org.cometd.annotation.Listener;
-import org.cometd.annotation.Service;
-import org.cometd.annotation.Session;
+import java.util.HashMap;
+import java.util.Map;
 
 @Named
 @Singleton
-@Service("helloService")
-public class HelloService
+@Service("messageService")
+public class MessageService
 {
     @Inject
     private BayeuxServer bayeux;
@@ -46,14 +46,16 @@ public class HelloService
     {
     }
 
-    @Listener("/service/hello")
-    public void processHello(ServerSession remote, ServerMessage.Mutable message)
+    @Listener("/scribbol")
+    public void processMessage(ServerSession remote, ServerMessage.Mutable message)
     {
         Map<String, Object> input = message.getDataAsMap();
         String name = (String)input.get("name");
 
+
+
         Map<String, Object> output = new HashMap<String, Object>();
-        output.put("greeting", "Hello, " + name);
-        remote.deliver(serverSession, "/hello", output, null);
+        output.put("greeting", "Hello,dasdfasfd " + name);
+        remote.deliver(serverSession, "/message", output, null);
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.scribbol;
+package org.scribbol.service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

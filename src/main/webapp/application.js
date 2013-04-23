@@ -50,12 +50,13 @@
             {
                 cometd.batch(function()
                 {
-                    cometd.subscribe('/hello', function(message)
+                    cometd.subscribe('/message', function(message)
                     {
                         $('#body').append('<div>Server Says: ' + message.data.greeting + '</div>');
+                        scribbol.net.receiveMessage(message.data);
                     });
                     // Publish on a service channel since the message is for the server only
-                    cometd.publish('/service/hello', { name: 'World' });
+                    cometd.publish('/service/message', { name: 'World' });
                 });
             }
         }
@@ -71,6 +72,8 @@
             url: cometURL,
             logLevel: 'debug'
         });
+
+        scribbolnet.cometd = cometd;
 
         cometd.addListener('/meta/handshake', _metaHandshake);
         cometd.addListener('/meta/connect', _metaConnect);
