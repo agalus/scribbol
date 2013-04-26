@@ -33,7 +33,7 @@
                 <button type="button" class="btn mode" onclick="toggleMode()">Freehand / Sel</button>
                 <button type="button" class="btn rect" onclick="scribbol.newRectangle()">Rectangle</button>
                 <button type="button" class="btn circle" onclick="scribbol.newEllipse()">Circle</button>
-                <button type="button" class="btn debug">Debug</button>
+                <button type="button" class="btn debug" onclick="toggle_visibility('debugContainer')">Debug</button>
             </p>
         </div>
         <div id="canvasContainer">
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div id="debugContainer">
+    <div id="debugContainer" style="display:none;">
         <div id="logContainer">&nbsp;</div>
         <div id="body">&nbsp;</div>
     </div>
@@ -51,6 +51,14 @@
             canvasElement.width = document.width;
             canvasElement.height = document.height - toolbarContainer.style.pixelHeight;
 
+        }
+
+        function toggle_visibility(id) {
+            var e = document.getElementById(id);
+            if(e.style.display == 'block')
+                e.style.display = 'none';
+            else
+                e.style.display = 'block';
         }
 
         function generateId() {
