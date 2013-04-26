@@ -19,10 +19,25 @@ package org.scribbol.service;
 import org.cometd.annotation.Listener;
 import org.cometd.annotation.Service;
 import org.cometd.annotation.Session;
-import org.cometd.bayeux.Channel;
 import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
+import org.scribbol.data.Document;
+import org.scribbol.data.Path;
+import org.scribbol.data.ScribbolObject;
+import org.scribbol.handler.CommandArgumentException;
+import org.scribbol.handler.CommandException;
+import org.scribbol.handler.CommandHandler;
+import org.scribbol.handler.CommandHandlerFactory;
+import org.scribbol.message.Command;
+import org.scribbol.message.DrawCommand;
+import org.scribbol.message.MessageConstants;
+import org.scribbol.message.SystemMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -30,16 +45,28 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Named
 @Singleton
 @Service("messageService")
 public class MessageService
 {
+    private final Logger logger = LoggerFactory.getLogger(MessageService.class);
+
     @Inject
     private BayeuxServer bayeux;
     @Session
     private ServerSession serverSession;
+
+    @Autowired
+    private AgentService agentService;
+
+    @Autowired
+    private DocumentService documentService;
+
+    @Autowired
+    private CommandHandlerFactory commandHandlerFactory;
 
     @PostConstruct
     public void init()
@@ -50,12 +77,70 @@ public class MessageService
     public void processMessage(ServerSession remote, ServerMessage.Mutable message)
     {
         Map<String, Object> input = message.getDataAsMap();
-        String name = (String)input.get("name");
+        String commandString = (String)input.get(MessageConstants.COMMAND_KEY);
+        Command command = Command.fromString(commandString);
 
+        // Parse the command
+        if(command == null) {
+            logger.error("Invalid command string: {} from: {} data: ", commandString, remote.toString(), input.toString());
+            sendErrorMessage(remote, "Invalid command string: " + commandString);
+            return;
+        }
 
+        // Get the command handler
+        CommandHandler handler = commandHandlerFactory.getHandler(command);
 
+        // Execute the handler
+        try {
+            handler.handleMessage(remote, message);
+        }
+        catch (CommandArgumentException ex) {
+            logger.error("Command argument error: {} {}",ex.getArgument(), ex.getMessage());
+            sendErrorMessage(remote, "Argument exception " + ex.getArgument() + " : " + ex.getMessage());
+            return;
+        }
+        catch (CommandException ex) {
+            logger.error("Error: " + ex.getMessage(), ex);
+            sendErrorMessage(remote, "Error: " + ex.getMessage());
+            return;
+        }
+        catch(Exception ex) {
+            logger.error("Unexpected error occurred from: {} values: {}",remote.toString(), message.toString(), ex);
+            sendErrorMessage(remote, "Unexpected error occurred.");
+            return;
+        }
+
+//        // Send out system messages
+//        for(SystemMessage systemMessage : handler.getSystemMessages())
+//            sendSystemMessage(remote, systemMessage.getKey(), systemMessage.getMessage());
+//
+//        // Send out channel messages
+//        for(ServerMessage.Mutable channelMessage : handler.getChannelMessages())
+//            sendChannelMessage(remote, channelMessage, false);
+
+    }
+
+    protected void sendChannelMessage(ServerSession remote, ServerMessage.Mutable message, boolean includeRemote) {
+        String channelName = message.getChannel();
+        ServerChannel channel = bayeux.getChannel(channelName);
+        //channel.publish(serverSession,message);
+        Set<ServerSession> subscribers = channel.getSubscribers();
+        for(ServerSession subscriber : subscribers) {
+            if(!includeRemote && (subscriber == remote))
+                continue;
+            subscriber.deliver(remote, message);
+        }
+    }
+
+    protected void sendSystemMessage(ServerSession remote, String key, String message) {
         Map<String, Object> output = new HashMap<String, Object>();
-        output.put("greeting", "Hello,dasdfasfd " + name);
+        output.put(key, message);
+        remote.deliver(serverSession, "/message", output, null);
+    }
+
+    protected void sendErrorMessage(ServerSession remote, String error) {
+        Map<String, Object> output = new HashMap<String, Object>();
+        output.put(MessageConstants.ERROR_KEY, error);
         remote.deliver(serverSession, "/message", output, null);
     }
 }

@@ -31,8 +31,8 @@
         <div id="toolbar">
             <p>
                 <button type="button" class="btn mode" onclick="toggleMode()">Freehand / Sel</button>
-                <button type="button" class="btn rect">Rectangle</button>
-                <button type="button" class="btn circle">Circle</button>
+                <button type="button" class="btn rect" onclick="scribbol.newRectangle()">Rectangle</button>
+                <button type="button" class="btn circle" onclick="scribbol.newEllipse()">Circle</button>
                 <button type="button" class="btn debug">Debug</button>
             </p>
         </div>

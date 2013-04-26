@@ -8,4 +8,7 @@ package org.scribbol.data;
  * To change this template use File | Settings | File Templates.
  */
 public class Ellipse extends ScribbolObject {
+    public Ellipse(String id) {
+        super(id);
+    }
 }

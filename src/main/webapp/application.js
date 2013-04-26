@@ -50,13 +50,13 @@
             {
                 cometd.batch(function()
                 {
-                    cometd.subscribe('/message', function(message)
+                    cometd.subscribe('/scribbol', function(message)
                     {
                         $('#body').append('<div>Server Says: ' + message.data.greeting + '</div>');
                         scribbol.net.receiveMessage(message.data);
                     });
                     // Publish on a service channel since the message is for the server only
-                    cometd.publish('/service/message', { name: 'World' });
+                    cometd.publish('/scribbol', { name: 'World' });
                 });
             }
         }

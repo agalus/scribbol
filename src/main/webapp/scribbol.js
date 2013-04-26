@@ -43,6 +43,7 @@ scribbol.getDocument = function() {
 
 scribbol.util = { };
 scribbol.event = { };
+scribbol.draw = { };
 
 /**
  * Log a message to the log container
@@ -65,6 +66,7 @@ scribbol.util.log = function(message) {
 function addObject(object, id) {
     scribbol.canvas.add(object);
     scribbol.util.registerObject(object, id);
+    scribbol.canvas.renderAll();
 }
 
 /**
@@ -86,6 +88,15 @@ function registerObject(object, id) {
     object.SID = id;
     scribbol.id2ObjMap[id] = object;
     scribbol.util.log("Registered object" + id);
+}
+
+/**
+ *
+ * @param id
+ * @return {*}
+ */
+function getObject(id) {
+    return scribbol.id2ObjMap[id];
 }
 
 /**
@@ -123,6 +134,7 @@ function getObjectId(object) {
 scribbol.util.generateNewId = generateNewId;
 scribbol.util.registerObject = registerObject;
 scribbol.util.getObjectId = getObjectId;
+scribbol.util.getObject = getObject;
 scribbol.util.unregisterObject = unregisterObject;
 scribbol.util.unregisterObjectId = unregisterObjectId;
 scribbol.util.addObject = addObject;
@@ -131,12 +143,29 @@ function toggleMode() {
     scribbol.canvas.isDrawingMode = !scribbol.canvas.isDrawingMode;
 }
 
+function newRectangle() {
+    scribbol.canvas.isDrawingMode = false;
+    var rect = scribbol.draw.createDefaultRectangle();
+    scribbol.draw.addNewObject(rect);
+
+}
+
+function newEllipse() {
+    scribbol.canvas.isDrawingMode = false;
+    var rect = scribbol.draw.createDefaultEllipse();
+    scribbol.draw.addNewObject(rect);
+
+}
+
 function setDrawingMode(bool) {
     scribbol.canvas.isDrawingMode = bool;
 }
 
 scribbol.toggleMode = toggleMode;
 scribbol.setDrawingMode = setDrawingMode;
+scribbol.newRectangle = newRectangle;
+scribbol.newEllipse = newEllipse;
+
 
 
 /**
@@ -148,8 +177,48 @@ function handleEvent(eventName, event) {
     if( eventName == 'object:moving') {
         var object = event.target;
         var id = scribbol.util.getObjectId(object);
+        var docId = scribbol.getDocument();
 
+        var message = {
+            "command" : "draw",
+            "drawCommand" : "object:moving",
+            "docId": "default",
+            "objId": id,
+            "left": object.left,
+            "top": object.top
+        };
         scribbol.util.log('object moving: ' + id) ;
+        scribbol.net.sendMessage(message);
+    }
+    else if( eventName == 'object:scaling') {
+        var object = event.target;
+        var id = scribbol.util.getObjectId(object);
+        var docId = scribbol.getDocument();
+
+        var message = {
+            "command" : "draw",
+            "drawCommand" : "object:scaling",
+            "docId": "default",
+            "objId": id,
+            "scaleX": object.scaleX,
+            "scaleY": object.scaleY
+        };
+        scribbol.util.log('object rotating: ' + id) ;
+        scribbol.net.sendMessage(message);
+    }    else if( eventName == 'object:rotating') {
+        var object = event.target;
+        var id = scribbol.util.getObjectId(object);
+        var docId = scribbol.getDocument();
+
+        var message = {
+            "command" : "draw",
+            "drawCommand" : "object:rotating",
+            "docId": "default",
+            "objId": id,
+            "angle": object.angle
+        };
+        scribbol.util.log('object rotating: ' + id) ;
+        scribbol.net.sendMessage(message);
     }
     else if( eventName == 'path:created') { // stroke, strokeWidth, path, currentHeight, currentWidth, left, top
         var object = event.path;
@@ -157,16 +226,19 @@ function handleEvent(eventName, event) {
         var docId = scribbol.getDocument();
 
         var message = {
-            "type" : "path:created",
-            "docId": docId,
-            "id": id,
+            "command" : "draw",
+            "drawCommand" : "path:created",
+            "docId": "default",
+            "objId": id,
             "width": object.width,
             "height": object.height,
             "left": object.left,
             "top": object.top,
             "stroke": object.stroke.toString(),
             "strokeWidth": object.strokeWidth,
-            "path": object.path.toString()
+            "path": object.path.toString(),
+            "svg": object.toSVG(),
+            "fill": object.fill
         };
         scribbol.util.registerObject(object, id);
         scribbol.util.log('path created: ' + id);
@@ -207,6 +279,132 @@ function dummyReceiveMessage(message) {
 
 scribbol.net.sendMessage = dummySendMessage;
 scribbol.net.receiveMessage = dummyReceiveMessage;
+
+
+function handleMessage(message) {
+    scribbol.util.log("DUMMY RECEIVE: " + JSON.stringify(message));
+    if(message.command == 'draw') {
+        handleDrawCommand(message);
+    }
+}
+
+function handleDrawCommand(message) {
+    scribbol.util.log("handling draw command " + JSON.stringify(message));
+    var drawCommand = message.drawCommand
+    if(message.drawCommand == 'path:created') {
+        var obj = new fabric.Path(message.path);
+
+        obj.width = message.width;
+        obj.height = message.height;
+        obj.left = message.left;
+        obj.top = message.top;
+        obj.strokeWidth = message.strokeWidth;
+        obj.stroke = message.stroke;
+        obj.fill = message.fill;
+
+        var objId = message.objId
+        scribbol.util.registerObject(obj, objId);
+        scribbol.canvas.add(obj);
+    } else if(message.drawCommand == 'object:moving') {
+        var objId = message.objId;
+        var obj = scribbol.util.getObject(objId);
+        obj.left = message.left;
+        obj.top = message.top;
+        scribbol.canvas.renderAll();
+    } else if(message.drawCommand == 'object:rotating') {
+        var objId = message.objId;
+        var obj = scribbol.util.getObject(objId);
+        obj.angle = message.angle;
+        scribbol.canvas.renderAll();
+    } else if(message.drawCommand == 'object:scaling') {
+        var objId = message.objId;
+        var obj = scribbol.util.getObject(objId);
+        obj.scaleX = message.scaleX;
+        obj.scaleY = message.scaleY;
+        scribbol.canvas.renderAll();
+    } else if(message.drawCommand == 'object:created') {
+        var objId = message.objId;
+        var obj;
+        if(message.type == 'rect') {
+            obj = new fabric.Rect({
+                left: message.left,
+                top: message.top,
+                fill: message.fill,
+                width: message.width,
+                height: message.height
+            });
+
+        } else if(message.type == 'circle') {
+            obj =   new fabric.Circle({
+                left: message.left,
+                top: message.top,
+                radius: message.radius,
+                fill: message.fill
+            });
+        } else {
+            return;
+        }
+        scribbol.util.registerObject(obj, objId);
+        scribbol.canvas.add(obj);
+
+
+    }
+
+}
+
+scribbol.handleMessage = handleMessage;
+
+function createDefaultRectangle() {
+    var rect = new fabric.Rect({
+        left: 100,
+        top: 100,
+        fill: 'green',
+        width: 20,
+        height: 20
+    });
+    return rect;
+}
+function createDefaultEllipse() {
+    var circle = new fabric.Circle({
+        left: 100,
+        top: 100,
+        radius: 50,
+        fill: 'red'
+    });
+    return circle;
+
+}
+function addNewObject(object) {
+    var id = scribbol.util.generateNewId().toString();
+    scribbol.canvas.add(object);
+    scribbol.util.registerObject(object, id);
+    scribbol.canvas.renderAll();
+
+    var docId = scribbol.getDocument();
+
+    var message = {
+        "command" : "draw",
+        "drawCommand" : "object:created",
+        "docId": "default",
+        "objId": id,
+        "type" : object.type,
+        "width": object.width,
+        "height": object.height,
+        "left": object.left,
+        "top": object.top,
+        "stroke": object.stroke,
+        "strokeWidth": object.strokeWidth,
+        "svg": object.toSVG(),
+        "fill": object.fill,
+        "radius" : object.radius
+    };
+    scribbol.util.log('object created: ' + id);
+    scribbol.net.sendMessage(message);
+
+}
+scribbol.draw.createDefaultEllipse = createDefaultEllipse;
+scribbol.draw.createDefaultRectangle = createDefaultRectangle;
+scribbol.draw.addNewObject = addNewObject;
 
 
 

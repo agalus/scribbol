@@ -13,7 +13,7 @@ public enum DrawCommand {
     OBJECT_MOVE("object:moving"),
     OBJECT_SCALED("object:scaling"),
     OBJECT_ROTATE("object:rotating"),
-    OBJECT_CLEAR("before:selection:cleared"),
+    OBJECT_CLEAR("selection:cleared"),
     SELECTION_CLEAR("selection:cleared"),
     SELECTION_CREATE("selection:created"),
     MOUSE_UP("mouse:up"),
@@ -38,7 +38,7 @@ public enum DrawCommand {
         this.messageName = messageName;
     }
 
-    public DrawCommand fromString(String s) {
+    public static DrawCommand fromString(String s) {
         for(DrawCommand m: DrawCommand.values()) {
             if(m.getMessageName().equals(s))
                 return m;
@@ -48,5 +48,9 @@ public enum DrawCommand {
 
     public String toString() {
         return getMessageName();
+    }
+
+    public static final String getKey() {
+        return "drawCommand";
     }
 }

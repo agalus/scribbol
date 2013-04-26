@@ -31,7 +31,7 @@ public enum Command {
         this.messageName = messageName;
     }
 
-    public Command fromString(String s) {
+    public static Command fromString(String s) {
         for(Command m: Command.values()) {
             if(m.getMessageName().equals(s))
                 return m;
@@ -41,5 +41,9 @@ public enum Command {
 
     public String toString() {
         return getMessageName();
+    }
+
+    public static final String getKey() {
+        return "command";
     }
 }

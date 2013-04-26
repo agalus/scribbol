@@ -18,5 +18,8 @@ public class DocumentDAOImpl extends AbstractInMemoryDAO<Document> implements Do
 
     protected DocumentDAOImpl() {
         super(Document.class);
+        Document defaultDoc = new Document();
+        defaultDoc.setId("default");
+        this.create(defaultDoc);
     }
 }

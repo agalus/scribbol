@@ -16,6 +16,11 @@ public class ScribbolObject {
     protected int left;
     protected int width;
     protected int height;
+    protected String SVG;
+
+    public ScribbolObject(String id) {
+        this.SID = id;
+    }
 
     public int getAngle() {
         return angle;
@@ -79,5 +84,13 @@ public class ScribbolObject {
 
     public void setSID(String SID) {
         this.SID = SID;
+    }
+
+    public String getSVG() {
+        return SVG;
+    }
+
+    public void setSVG(String SVG) {
+        this.SVG = SVG;
     }
 }

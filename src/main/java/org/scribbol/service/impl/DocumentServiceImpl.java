@@ -6,6 +6,9 @@ import org.scribbol.data.Document;
 import org.scribbol.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: drew
@@ -17,6 +20,8 @@ public class DocumentServiceImpl extends AbstractCrudService<Document, String> i
 
     @Autowired
     protected DocumentDAO documentDAO;
+
+    protected Map<String, Document> documentMap = new HashMap<String, Document>();
 
     protected DocumentServiceImpl() {
         super(Document.class);
