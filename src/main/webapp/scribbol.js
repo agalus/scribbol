@@ -143,6 +143,14 @@ function toggleMode() {
     scribbol.canvas.isDrawingMode = !scribbol.canvas.isDrawingMode;
 }
 
+function setSelectMode() {
+    scribbol.canvas.isDrawingMode = false;
+}
+
+function setFreehandMode() {
+    scribbol.canvas.isDrawingMode = true;
+}
+
 function newRectangle() {
     scribbol.canvas.isDrawingMode = false;
     var rect = scribbol.draw.createDefaultRectangle();
@@ -162,6 +170,8 @@ function setDrawingMode(bool) {
 }
 
 scribbol.toggleMode = toggleMode;
+scribbol.setFreehandMode = setFreehandMode;
+scribbol.setSelectMode = setSelectMode;
 scribbol.setDrawingMode = setDrawingMode;
 scribbol.newRectangle = newRectangle;
 scribbol.newEllipse = newEllipse;
