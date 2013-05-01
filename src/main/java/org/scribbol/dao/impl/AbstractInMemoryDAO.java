@@ -1,7 +1,7 @@
 package org.scribbol.dao.impl;
 
 import org.scribbol.dao.DAO;
-import org.scribbol.data.BaseEntity;
+import org.scribbol.domain.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;

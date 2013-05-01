@@ -1,14 +1,14 @@
-package org.scribbol.data;
+package org.scribbol.domain;
 
 /**
  * Created with IntelliJ IDEA.
  * User: drew
  * Date: 4/7/13
- * Time: 11:02 PM
+ * Time: 10:57 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Line extends ScribbolObject {
-    public Line(String id) {
+public class Rectangle extends ScribbolObject {
+    public Rectangle(String id) {
         super(id);
     }
 }

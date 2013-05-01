@@ -1,6 +1,6 @@
 package org.scribbol.manager;
 
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 
 import java.util.*;
 

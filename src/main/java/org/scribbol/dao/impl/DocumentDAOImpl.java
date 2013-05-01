@@ -1,11 +1,7 @@
 package org.scribbol.dao.impl;
 
 import org.scribbol.dao.DocumentDAO;
-import org.scribbol.data.Document;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import org.scribbol.domain.Document;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,4 +1,4 @@
-package org.scribbol.data;
+package org.scribbol.domain;
 
 /**
  * Created with IntelliJ IDEA.

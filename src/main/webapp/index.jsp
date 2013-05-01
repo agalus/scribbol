@@ -8,6 +8,9 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/jquery/jquery.cometd.js"></script>
     <script type="text/javascript" src="scribbol.js"></script>
     <script type="text/javascript" src="scribbol-net.js"></script>
+    <script type="text/javascript" src="scribbol-handler.js"></script>
+    <script type="text/javascript" src="scribbol-message.js"></script>
+    <script type="text/javascript" src="scribbol-draw.js"></script>
     <script type="text/javascript" src="sha1.js"></script>
     <script type="text/javascript" src="application.js"></script>
     <%--
@@ -31,9 +34,18 @@
         <div id="toolbar">
             <p>
                 <button type="button" class="btn mode" onclick="toggleMode()">Freehand / Sel</button>
+                <button type="button" class="btn mode" onclick="scribbol.draw.selectNone()">Select None</button>
                 <button type="button" class="btn rect" onclick="scribbol.newRectangle()">Rectangle</button>
                 <button type="button" class="btn circle" onclick="scribbol.newEllipse()">Circle</button>
+                <button type="button" class="btn circle" onclick="scribbol.draw.drawText('test')">Text</button>
+                <button type="button" class="btn debug" onclick="scribbol.draw.deleteSelected()">Delete Selected</button>
                 <button type="button" class="btn debug" onclick="toggle_visibility('debugContainer')">Debug</button>
+            </p>
+            <p>
+                Fill Color:<input type="color" id="frmFillColor" value="#FF0000"/>
+                Stroke Color:<input type="color" id="frmStrokeColor" value="#000000"/>
+                Stroke Width:<input type="number" id="frmStrokeWidth" value="5"/>
+                <button type="button" class="btn debug" onclick="applyStyle()">Apply</button>
             </p>
         </div>
         <div id="canvasContainer">
@@ -65,6 +77,16 @@
             var i = Math.random();
             var hash = CryptoJS.SHA1("scribbol" +i);
             return hash;
+        }
+
+        function applyStyle() {
+            var style = {
+                strokeColor : document.getElementById("frmStrokeColor").value,
+                strokeWidth : document.getElementById("frmStrokeWidth").value,
+                fillColor : document.getElementById("frmFillColor").value
+            };
+            scribbol.draw.setObjectStyleSelected(style);
+
         }
 
 

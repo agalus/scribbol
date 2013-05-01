@@ -1,9 +1,8 @@
 package org.scribbol.manager;
 
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

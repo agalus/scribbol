@@ -1,11 +1,7 @@
 package org.scribbol.dao.impl;
 
 import org.scribbol.dao.AgentDAO;
-import org.scribbol.data.Agent;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import org.scribbol.domain.Agent;
 
 /**
  * Created with IntelliJ IDEA.

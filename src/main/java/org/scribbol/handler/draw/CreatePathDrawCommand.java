@@ -2,8 +2,7 @@ package org.scribbol.handler.draw;
 
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
-import org.scribbol.data.Path;
-import org.scribbol.data.ScribbolObject;
+import org.scribbol.domain.Path;
 import org.scribbol.handler.CommandArgumentException;
 import org.scribbol.message.MessageConstants;
 import org.slf4j.Logger;

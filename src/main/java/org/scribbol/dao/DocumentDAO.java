@@ -1,7 +1,7 @@
 package org.scribbol.dao;
 
 
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 
 /**
  * Created with IntelliJ IDEA.

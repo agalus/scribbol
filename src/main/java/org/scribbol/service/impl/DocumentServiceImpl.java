@@ -2,7 +2,7 @@ package org.scribbol.service.impl;
 
 import org.scribbol.dao.DAO;
 import org.scribbol.dao.DocumentDAO;
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 import org.scribbol.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 

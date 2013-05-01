@@ -2,7 +2,7 @@ package org.scribbol.service.impl;
 
 import org.scribbol.dao.AgentDAO;
 import org.scribbol.dao.DAO;
-import org.scribbol.data.Agent;
+import org.scribbol.domain.Agent;
 import org.scribbol.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -2,7 +2,7 @@ package org.scribbol.handler;
 
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
-import org.scribbol.data.Agent;
+import org.scribbol.domain.Agent;
 import org.scribbol.message.MessageConstants;
 import org.scribbol.message.SessionConstants;
 import org.springframework.util.StringUtils;

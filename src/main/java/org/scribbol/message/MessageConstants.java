@@ -26,6 +26,7 @@ public class MessageConstants {
     public static final String DRAW_TRANSFORM_ROTATE =  "rotate";
     public static final String DRAW_OBJECT_SVG = "svg";
     public static final String DRAW_OBJECT_PATH = "path";
+    public static final String DRAW_DELETE_IDS = "ids";
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";

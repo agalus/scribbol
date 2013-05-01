@@ -1,9 +1,8 @@
 package org.scribbol.handler.draw;
 
-import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 import org.scribbol.handler.AbstractCommandHandler;
 import org.scribbol.handler.CommandArgumentException;
 import org.scribbol.handler.CommandException;

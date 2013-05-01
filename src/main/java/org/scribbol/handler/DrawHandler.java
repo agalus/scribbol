@@ -22,7 +22,7 @@ public class DrawHandler extends AbstractCommandHandler {
     protected void internalHandleMessage(ServerSession remote, ServerMessage.Mutable message) {
         AbstractDrawCommandHandler drawCommandHandler = null;
         switch(drawCommand) {
-            case OBJECT_CLEAR:
+            case OBJECT_DELETED:
                 drawCommandHandler = new ClearObjectDrawCommand();
                 break;
             case OBJECT_ADD:
@@ -39,6 +39,9 @@ public class DrawHandler extends AbstractCommandHandler {
                 break;
             case OBJECT_SCALED:
                 drawCommandHandler = new ScaleObjectDrawCommand();
+                break;
+            case OBJECT_MODIFY:
+                drawCommandHandler = new MoveObjectDrawCommand();
                 break;
         }
 

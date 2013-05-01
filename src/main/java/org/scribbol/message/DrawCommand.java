@@ -13,7 +13,7 @@ public enum DrawCommand {
     OBJECT_MOVE("object:moving"),
     OBJECT_SCALED("object:scaling"),
     OBJECT_ROTATE("object:rotating"),
-    OBJECT_CLEAR("selection:cleared"),
+    OBJECT_DELETED("object:deleted"),
     SELECTION_CLEAR("selection:cleared"),
     SELECTION_CREATE("selection:created"),
     MOUSE_UP("mouse:up"),
@@ -21,7 +21,7 @@ public enum DrawCommand {
     MOUSE_MOVE("mouse:move"),
     AFTER_RENDER("after:render"),
     PATH_CREATE("path:created"),
-    OBJECT_ADD("object:added"),
+    OBJECT_ADD("object:created"),
     DOCUMENT_OPEN("document:open"),
     DOCUMENT_CLOSE("document:close");
 

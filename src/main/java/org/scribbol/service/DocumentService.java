@@ -1,6 +1,6 @@
 package org.scribbol.service;
 
-import org.scribbol.data.Document;
+import org.scribbol.domain.Document;
 
 /**
  * Created with IntelliJ IDEA.
